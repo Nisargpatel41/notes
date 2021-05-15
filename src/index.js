@@ -22,7 +22,7 @@ const App = () => {
           <MainContainer />
         </PersistGate>
       </NavigationContainer>
-      <FlashMessage position="top" />
+      <FlashMessage position="bottom" />
     </Provider>
   );
 };

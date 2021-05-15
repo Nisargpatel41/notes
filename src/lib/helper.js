@@ -3,15 +3,12 @@ import theme from '../theme';
 import NetInfo from '@react-native-community/netinfo';
 import {Constants} from '../lib/constant';
 
-export const onMessageShow = (msg, color) => {
+export const onMessageShow = (msg, type = 'danger') => {
   showMessage({
     message: msg,
     autoHide: true,
     floating: true,
-    style: {
-      backgroundColor: color,
-    },
-    titleStyle: {color: theme.colors.WHITE},
+    type: type,
   });
 };
 

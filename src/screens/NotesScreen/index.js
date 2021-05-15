@@ -1,25 +1,40 @@
 import React, {Component} from 'react';
-import {Button, Text, View} from 'react-native';
+import {Button, StyleSheet, Text, View} from 'react-native';
+import {Header, NoteCard} from '../../components';
 import navigation from '../../lib/navigationService';
 import {AppRoute} from '../../navigation/appRoute';
-import {RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
+import theme from '../../theme';
 
-class NotesScreen extends Component {
-  render() {
-    return (
-      <View style={{flex: 1}}>
-        <RichEditor
-          onChange={e => console.log(e)}
-          ref={r => (this.richText = r)}
-          initialContentHTML={
-            'Hello <b>World</b> <p>this is a new paragraph</p> <p>this is another new paragraph</p>'
-          }
-          // editorInitializedCallback={() => this.onEditorInitialized()}
+const NotesScreen = () => {
+  return (
+    <View style={styles.main}>
+      <Header title="Nisu's notes" searchEnabled />
+      <View style={styles.contentView}>
+        <NoteCard
+          note="he editor component. Simply place this component in your view hi"
+          desc="useContainer A boolean value that determines if a View container is wrapped around the WebView. The default value is true. If you are using your own View to wrap this library around, set this value to false."
         />
-        <RichToolbar getEditor={() => this.richText} />
+        <NoteCard
+          note="he editor component. Simply place this component in your view hi"
+          desc="useContainer A boolean value that determines if a View container is wrapped around the WebView. The default value is true. If you are using your own View to wrap this library around, set this value to false."
+        />
       </View>
-    );
-  }
-}
+      {/* <Button
+        title="Add Note"
+        onPress={() => navigation.navigate(AppRoute.ADD_NOTE)}
+      /> */}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    backgroundColor: theme.colors.WHITE,
+  },
+  contentView: {
+    paddingHorizontal: 20,
+  },
+});
 
 export default NotesScreen;
