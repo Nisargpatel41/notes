@@ -1,20 +1,29 @@
 import React from 'react';
-import {StyleSheet, View, TouchableOpacity, Text} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+} from 'react-native';
 import {Icon} from '..';
 import theme from '../../theme';
 import {truncate} from '../../lib/helper';
 import moment from 'moment';
+import HTML from 'react-native-render-html';
 
 const titleLength = 25;
 const descLength = 100;
 
-const NoteCard = ({note, desc}) => {
+const NoteCard = ({note}) => {
   return (
     <View style={styles.cardMain}>
       <View style={styles.cardHeader}>
         <View style={styles.titleView}>
           <Text style={styles.title}>
-            {note.length > titleLength ? truncate(note, titleLength) : note}
+            {note?.title.length > titleLength
+              ? truncate(note?.title, titleLength)
+              : note?.title}
           </Text>
         </View>
         <View style={styles.iconsView}>
@@ -26,25 +35,26 @@ const NoteCard = ({note, desc}) => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.cardBody}>
+      <ScrollView style={styles.cardBody}>
         <View style={styles.timeView}>
           <Text style={styles.time}>
             {moment().format('DD MMM YYYY hh:mm:a')}
           </Text>
         </View>
         <View style={styles.descView}>
-          <Text style={styles.desc}>
-            {desc.length > descLength ? truncate(desc, descLength) : desc}
-          </Text>
+          <HTML source={{html: note?.note}} />
+          {/* {note?.note.length > descLength
+              ? truncate(note?.note, descLength)
+              : note?.note} */}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   cardMain: {
-    height: 170,
+    // height: 170,
     borderWidth: 1,
     borderColor: '#d4d4d4',
     elevation: 1,
@@ -75,7 +85,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardBody: {
-    height: 120,
     paddingHorizontal: 5,
   },
   timeView: {

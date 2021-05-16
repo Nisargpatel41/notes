@@ -69,6 +69,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: '100%',
     backgroundColor: theme.colors.WHITE,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.GREY3,
     paddingHorizontal: 20,
   },
   title: {
