@@ -38,11 +38,14 @@ const NoteCard = ({note}) => {
       <ScrollView style={styles.cardBody}>
         <View style={styles.timeView}>
           <Text style={styles.time}>
-            {moment().format('DD MMM YYYY hh:mm:a')}
+            C: {moment(note?.createdAt).format('DD MMM YYYY hh:mm:a')}
+          </Text>
+          <Text style={styles.time}>
+            M: {moment(note?.modifiedAt).format('DD MMM YYYY hh:mm:a')}
           </Text>
         </View>
         <View style={styles.descView}>
-          <HTML source={{html: note?.note}} />
+          <HTML source={{html: note?.content}} />
           {/* {note?.note.length > descLength
               ? truncate(note?.note, descLength)
               : note?.note} */}

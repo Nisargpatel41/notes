@@ -66,7 +66,10 @@ class AddNoteScreen extends Component {
           </View>
           <View style={styles.buttonsRow}>
             <AddNoteButton text="Save" onPress={() => this.onSaveHandler()} />
-            <AddNoteButton text="Cancel" />
+            <AddNoteButton
+              text="Cancel"
+              onPress={() => navigation.navigate(AppRoute.NOTES)}
+            />
           </View>
           <View style={styles.buttonsRow}>
             <AddNoteButton text="Archive" />
