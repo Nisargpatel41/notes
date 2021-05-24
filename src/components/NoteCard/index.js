@@ -45,12 +45,14 @@ const NoteCard = ({note}) => {
             Created On : {moment(note?.createdAt).format('DD MMM YYYY hh:mm a')}
           </Text>
         </View>
-        <View style={styles.descView}>
-          <HTML source={{html: note?.content}} />
-          {/* {note?.note.length > descLength
+        {note.content !== '' ? (
+          <View style={styles.descView}>
+            <HTML source={{html: note?.content}} />
+            {/* {note?.note.length > descLength
               ? truncate(note?.note, descLength)
               : note?.note} */}
-        </View>
+          </View>
+        ) : null}
       </ScrollView>
     </View>
   );
@@ -63,6 +65,7 @@ const styles = StyleSheet.create({
     borderColor: '#d4d4d4',
     elevation: 1,
     marginTop: 20,
+    paddingBottom: 10,
   },
   cardHeader: {
     height: 50,

@@ -25,6 +25,9 @@ export default {
       fetch(url, {
         body: JSON.stringify(data),
         method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
       })
         .then(response => response.json())
         .then(responseText => {
@@ -41,6 +44,9 @@ export default {
       fetch(url, {
         body: JSON.stringify(data),
         method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
       })
         .then(response => response.json())
         .then(responseText => {

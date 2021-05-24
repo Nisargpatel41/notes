@@ -8,20 +8,41 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-import navigation from '../../lib/navigationService';
-import {AppRoute} from '../../navigation/appRoute';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
-import theme from '../../theme';
-import {AddNoteButton, Header} from '../../components';
+import moment from 'moment';
+
+import {AddNoteButton, Header, LoadingContainer} from '../../components';
 import {onMessageShow} from '../../lib/helper';
+import navigation from '../../lib/navigationService';
+import theme from '../../theme';
+import {AppRoute} from '../../navigation/appRoute';
+import {addNoteAction} from '../NotesScreen/action';
+
 const {width} = Dimensions.get('window');
 class AddNoteScreen extends Component {
   state = {
     data: {
       title: '',
-      description: '',
+      content: '',
     },
   };
+
+  componentDidUpdate(prevProps) {
+    const {success, error} = this.props;
+
+    if (prevProps.success !== success) {
+      onMessageShow(success, 'success');
+      setTimeout(() => {
+        navigation.navigate(AppRoute.NOTES);
+      }, 500);
+    }
+
+    if (prevProps.error !== error) {
+      onMessageShow(error, 'danger');
+    }
+  }
 
   onChangeHandler(type, value) {
     const data = {...this.state.data};
@@ -30,7 +51,14 @@ class AddNoteScreen extends Component {
   }
 
   onSaveHandler() {
-    onMessageShow('Please enter title', 'danger');
+    if (!this.state.data.title) {
+      onMessageShow('Please enter title', 'danger');
+    } else {
+      let data = {...this.state.data};
+      data['createdAt'] = moment().toISOString();
+      data['modifiedAt'] = moment().toISOString();
+      this.props.addNoteAction(data);
+    }
   }
 
   render() {
@@ -43,18 +71,18 @@ class AddNoteScreen extends Component {
               style={styles.input}
               placeholder="title"
               placeholderTextColor={theme.colors.GREY2}
-              onChange={text => this.onChangeHandler('title', text)}
+              onChangeText={text => this.onChangeHandler('title', text)}
               value={this.state.title}
             />
           </View>
           <View style={styles.editorView}>
             <RichToolbar
               getEditor={() => this.richText}
-              selectedButtonStyle={{backgroundColor: theme.colors.BLUE}}
+              selectedIconTint={theme.colors.PRIMARY_BLUE}
               style={styles.toolbar}
             />
             <RichEditor
-              onChange={text => this.onChangeHandler('description', text)}
+              onChange={text => this.onChangeHandler('content', text)}
               placeholder="note"
               editorStyle={{placeholderColor: theme.colors.GREY2}}
               ref={r => (this.richText = r)}
@@ -75,6 +103,7 @@ class AddNoteScreen extends Component {
             <AddNoteButton text="Delete" />
           </View>
         </ScrollView>
+        <LoadingContainer loading={this.props.loading} />
       </View>
     );
   }
@@ -114,4 +143,21 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddNoteScreen;
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    {
+      addNoteAction,
+    },
+    dispatch,
+  );
+}
+
+const mapStateToProps = state => {
+  return {
+    loading: state.notesReducer.loading,
+    error: state.notesReducer.error,
+    success: state.notesReducer.success,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddNoteScreen);

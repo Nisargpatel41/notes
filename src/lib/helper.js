@@ -8,6 +8,7 @@ export const onMessageShow = (msg, type = 'danger') => {
     autoHide: true,
     floating: true,
     type: type,
+    duration: 1000,
   });
 };
 
@@ -43,4 +44,8 @@ export const UUID = () => {
     },
   );
   return uuid;
+};
+
+export const arrayIfKeySame = (data, key) => {
+  return [...new Map(data.map(x => [key(x), x])).values()];
 };

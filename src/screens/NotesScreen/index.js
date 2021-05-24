@@ -27,7 +27,7 @@ import {getNotesAction} from './action';
 
 const {height} = Dimensions.get('window');
 
-const NotesScreen = () => {
+const NotesScreen = ({navigation}) => {
   let dispatch = useDispatch();
 
   const {notes, loading} = useSelector(state => ({
@@ -39,8 +39,10 @@ const NotesScreen = () => {
   const [sortedNotes, setSortedNotes] = useState([]);
 
   useEffect(() => {
-    dispatch(getNotesAction());
-  }, []);
+    navigation.addListener('focus', () => {
+      dispatch(getNotesAction());
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const newarr = notes.sort((a, b) => {

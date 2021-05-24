@@ -6,8 +6,8 @@ export const getNotesApi = () => {
   return result;
 };
 
-// export const submitPhotoApi = data => {
-//   let url = 'owner/photos';
-//   let result = coreApi.POST_IMAGE(url, data);
-//   return result;
-// };
+export const addNoteApi = data => {
+  let url = '/addNote';
+  let result = coreApi.POST(url, data);
+  return result;
+};
