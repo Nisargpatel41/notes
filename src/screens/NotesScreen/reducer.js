@@ -12,7 +12,11 @@ import createReducer from '../../lib/createReducer';
 let initialState = {
   error: '',
   notes: [],
-  pendingNotes: [],
+  pendingAddNotes: [],
+  pendingUpdateNotes: [],
+  pendingArchiveNotes: [],
+  pendingDeleteNotes: [],
+  syncCompleted: '',
   success: '',
   loading: false,
 };
@@ -27,7 +31,7 @@ export const notesReducer = createReducer(initialState, {
 
   [GET_NOTES_SUCCESS](state, action) {
     return Object.assign({}, state, {
-      notes: [...state.pendingNotes, ...action.payload.result],
+      notes: [...state.pendingAddNotes, ...action.payload.result],
       error: '',
       loading: false,
     });
@@ -49,7 +53,7 @@ export const notesReducer = createReducer(initialState, {
     //     payloadValue,
     //   );
     return Object.assign({}, state, {
-      pendingNotes: action.payload,
+      pendingAddNotes: action.payload,
     });
   },
 
@@ -64,7 +68,7 @@ export const notesReducer = createReducer(initialState, {
     //     );
     //   }
     return Object.assign({}, state, {
-      pendingNotes: action.payload,
+      pendingAddNotes: action.payload,
     });
   },
 
@@ -73,6 +77,7 @@ export const notesReducer = createReducer(initialState, {
       error: '',
       loading: false,
       success: '',
+      syncCompleted: '',
     });
   },
 });

@@ -38,10 +38,11 @@ const NoteCard = ({note}) => {
       <ScrollView style={styles.cardBody}>
         <View style={styles.timeView}>
           <Text style={styles.time}>
-            C: {moment(note?.createdAt).format('DD MMM YYYY hh:mm:a')}
+            Modified On :{' '}
+            {moment(note?.modifiedAt).format('DD MMM YYYY hh:mm a')}
           </Text>
           <Text style={styles.time}>
-            M: {moment(note?.modifiedAt).format('DD MMM YYYY hh:mm:a')}
+            Created On : {moment(note?.createdAt).format('DD MMM YYYY hh:mm a')}
           </Text>
         </View>
         <View style={styles.descView}>

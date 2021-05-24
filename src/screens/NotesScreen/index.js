@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {
   Button,
@@ -35,10 +36,18 @@ const NotesScreen = () => {
   }));
 
   const [isVisible, setIsVisible] = useState(false);
+  const [sortedNotes, setSortedNotes] = useState([]);
 
   useEffect(() => {
     dispatch(getNotesAction());
   }, []);
+
+  useEffect(() => {
+    const newarr = notes.sort((a, b) => {
+      return moment(b.modifiedAt).diff(a.modifiedAt);
+    });
+    setSortedNotes(newarr);
+  }, [notes]);
 
   return (
     <View style={styles.main}>
@@ -46,9 +55,9 @@ const NotesScreen = () => {
       <View style={styles.contentView}>
         {/* <Button title="test" onPress={() => setIsVisible(true)} /> */}
 
-        {notes.length > 0 ? (
+        {sortedNotes.length > 0 ? (
           <FlatList
-            data={notes}
+            data={sortedNotes}
             key="_"
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}

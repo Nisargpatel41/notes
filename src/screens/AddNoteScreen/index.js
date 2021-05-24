@@ -61,7 +61,6 @@ class AddNoteScreen extends Component {
               // initialContentHTML={
               //   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text"
               // }
-              // editorInitializedCallback={() => this.onEditorInitialized()}
             />
           </View>
           <View style={styles.buttonsRow}>
