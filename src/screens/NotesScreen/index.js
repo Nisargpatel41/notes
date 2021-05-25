@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import NetInfo from '@react-native-community/netinfo';
+import SplashScreen from 'react-native-splash-screen';
 
 import {
   ConfirmModal,
@@ -53,6 +54,10 @@ const NotesScreen = ({navigation}) => {
   const [isVisible, setIsVisible] = useState(false);
   const [sortedNotes, setSortedNotes] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
 
   useEffect(() => {
     navigation.addListener('focus', () => {
