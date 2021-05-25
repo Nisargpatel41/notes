@@ -33,7 +33,9 @@ class AddNoteScreen extends Component {
     const {success, error} = this.props;
 
     if (prevProps.success !== success) {
-      onMessageShow(success, 'success');
+      if (success !== '') {
+        onMessageShow(success, 'success');
+      }
       setTimeout(() => {
         navigation.navigate(AppRoute.NOTES);
       }, 500);

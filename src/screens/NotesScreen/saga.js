@@ -10,6 +10,10 @@ import {
   ADD_NOTE_ERROR,
   ADD_NOTE_LOADING,
   ADD_PENDING_NOTE,
+  CALL_PENDING_SUBMITS_ACTION,
+  CALL_PENDING_SUBMITS_ERROR,
+  CALL_PENDING_SUBMITS_LOADING,
+  CALL_PENDING_SUBMITS_SUCCESS,
   CLEAR_ERROR,
 } from './types';
 import {delay, isConnected, UUID} from '../../lib/helper';
@@ -40,7 +44,6 @@ function* addNoteSaga(data) {
     try {
       yield put({type: ADD_NOTE_LOADING, payload: true});
       let res = yield call(addNoteApi, data.payload);
-      console.log(res);
       if (res.status === 200) {
         yield put({type: ADD_NOTE_SUCCESS, payload: res.message});
       } else {
@@ -58,8 +61,32 @@ function* addNoteSaga(data) {
   yield put({type: CLEAR_ERROR});
 }
 
+function* callPendingSubmitsSaga(data) {
+  let {pendingAddNotes} = data.payload;
+  let connected = yield call(isConnected);
+  if (connected) {
+    try {
+      yield put({type: CALL_PENDING_SUBMITS_LOADING, payload: true});
+      if (pendingAddNotes && pendingAddNotes.length > 0) {
+        for (const note of pendingAddNotes) {
+          delete note['_id'];
+          yield call(addNoteSaga, {payload: note});
+        }
+      }
+      yield put({
+        type: CALL_PENDING_SUBMITS_SUCCESS,
+        payload: 'Notes Sync Successfully',
+      });
+    } catch (error) {
+      yield put({type: CALL_PENDING_SUBMITS_ERROR, payload: error.toString()});
+    }
+  }
+  yield put({type: CLEAR_ERROR});
+}
+
 function* watchNotesSaga() {
   yield takeLatest(GET_NOTES_ACTION, getNotesSaga);
   yield takeLatest(ADD_NOTE_ACTION, addNoteSaga);
+  yield takeLatest(CALL_PENDING_SUBMITS_ACTION, callPendingSubmitsSaga);
 }
 export default watchNotesSaga;

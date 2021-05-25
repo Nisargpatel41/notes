@@ -7,7 +7,11 @@ import {
   ADD_NOTE_LOADING,
   ADD_NOTE_SUCCESS,
   ADD_PENDING_NOTE,
+  CALL_PENDING_SUBMITS_ERROR,
+  CALL_PENDING_SUBMITS_LOADING,
+  CALL_PENDING_SUBMITS_SUCCESS,
   UPDATE_PENDING_NOTE,
+  SET_PENDING_DATA,
 } from './types';
 import {arrayIfKeySame} from '../../lib/helper';
 
@@ -20,7 +24,8 @@ let initialState = {
   pendingUpdateNotes: [],
   pendingArchiveNotes: [],
   pendingDeleteNotes: [],
-  syncCompleted: '',
+  callPendingSubmitsSuccess: '',
+  callPendingSubmitsError: '',
   success: '',
   loading: false,
 };
@@ -99,12 +104,42 @@ export const notesReducer = createReducer(initialState, {
     });
   },
 
+  [CALL_PENDING_SUBMITS_SUCCESS](state, action) {
+    return Object.assign({}, state, {
+      callPendingSubmitsError: '',
+      loading: false,
+      callPendingSubmitsSuccess: action.payload,
+    });
+  },
+  [CALL_PENDING_SUBMITS_ERROR](state, action) {
+    return Object.assign({}, state, {
+      callPendingSubmitsError: action.payload,
+      loading: false,
+      callPendingSubmitsSuccess: '',
+    });
+  },
+  [CALL_PENDING_SUBMITS_LOADING](state, action) {
+    return Object.assign({}, state, {
+      loading: action.payload,
+    });
+  },
+
+  [SET_PENDING_DATA](state, action) {
+    return Object.assign({}, state, {
+      pendingAddNotes: [],
+      pendingUpdateNotes: [],
+      pendingArchiveNotes: [],
+      pendingDeleteNotes: [],
+    });
+  },
+
   [CLEAR_ERROR](state, action) {
     return Object.assign({}, state, {
       error: '',
       loading: false,
       success: '',
-      syncCompleted: '',
+      callPendingSubmitsSuccess: '',
+      callPendingSubmitsError: '',
     });
   },
 });

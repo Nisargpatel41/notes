@@ -11,6 +11,7 @@ import {
   Image,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import NetInfo from '@react-native-community/netinfo';
 
 import {
   ConfirmModal,
@@ -22,25 +23,48 @@ import {
 // import {notes} from '../../lib/dummyData';
 import navigation from '../../lib/navigationService';
 import {AppRoute} from '../../navigation/appRoute';
+import {onMessageShow} from '../../lib/helper';
 import theme from '../../theme';
-import {getNotesAction} from './action';
+import {
+  getNotesAction,
+  callPendingSubmits,
+  setPendingDataAction,
+} from './action';
 
 const {height} = Dimensions.get('window');
 
 const NotesScreen = ({navigation}) => {
   let dispatch = useDispatch();
 
-  const {notes, loading} = useSelector(state => ({
+  const {
+    notes,
+    loading,
+    pendingAddNotes,
+    callPendingSubmitsSuccess,
+    callPendingSubmitsError,
+  } = useSelector(state => ({
     notes: state.notesReducer.notes,
+    pendingAddNotes: state.notesReducer.pendingAddNotes,
+    callPendingSubmitsSuccess: state.notesReducer.callPendingSubmitsSuccess,
+    callPendingSubmitsError: state.notesReducer.callPendingSubmitsError,
     loading: state.notesReducer.loading,
   }));
 
   const [isVisible, setIsVisible] = useState(false);
   const [sortedNotes, setSortedNotes] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     navigation.addListener('focus', () => {
       dispatch(getNotesAction());
+      // NETINFO LISTENER
+      NetInfo.addEventListener(state => {
+        if (state.isConnected && state.isInternetReachable) {
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+        }
+      });
     });
   }, [navigation]);
 
@@ -50,6 +74,27 @@ const NotesScreen = ({navigation}) => {
     });
     setSortedNotes(newarr);
   }, [notes]);
+
+  // CALL DATA AND PENDING WHEN CONNECTED
+  useEffect(() => {
+    if (isConnected) {
+      if (pendingAddNotes.length > 0) {
+        dispatch(
+          callPendingSubmits({
+            pendingAddNotes: pendingAddNotes,
+          }),
+        );
+      }
+    }
+  }, [isConnected]);
+
+  useEffect(() => {
+    if (callPendingSubmitsSuccess !== '') {
+      onMessageShow(callPendingSubmitsSuccess, 'success');
+      dispatch(setPendingDataAction());
+      dispatch(getNotesAction());
+    }
+  }, [callPendingSubmitsSuccess]);
 
   return (
     <View style={styles.main}>
