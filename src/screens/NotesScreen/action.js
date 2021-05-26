@@ -4,6 +4,8 @@ import {
   UPDATE_NOTE_ACTION,
   CALL_PENDING_SUBMITS_ACTION,
   SET_PENDING_DATA,
+  ARCHIVE_NOTE_ACTION,
+  DELETE_NOTE_ACTION,
 } from './types';
 
 export const getNotesAction = () => ({
@@ -17,6 +19,16 @@ export const addNoteAction = data => ({
 
 export const updateNoteAction = data => ({
   type: UPDATE_NOTE_ACTION,
+  payload: data,
+});
+
+export const archiveNoteAction = data => ({
+  type: ARCHIVE_NOTE_ACTION,
+  payload: data,
+});
+
+export const deleteNoteAction = data => ({
+  type: DELETE_NOTE_ACTION,
   payload: data,
 });
 

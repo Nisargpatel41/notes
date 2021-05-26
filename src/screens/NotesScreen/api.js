@@ -17,3 +17,15 @@ export const updateNoteApi = data => {
   let result = coreApi.PUT(url, data);
   return result;
 };
+
+export const archiveNoteApi = data => {
+  let url = '/archiveNote';
+  let result = coreApi.PUT(url, data);
+  return result;
+};
+
+export const deleteNoteApi = data => {
+  let url = '/deleteNote';
+  let result = coreApi.PUT(url, data);
+  return result;
+};

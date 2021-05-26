@@ -13,12 +13,22 @@ import {bindActionCreators} from 'redux';
 import {RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
 import moment from 'moment';
 
-import {AddNoteButton, Header, LoadingContainer} from '../../components';
+import {
+  AddNoteButton,
+  Header,
+  LoadingContainer,
+  ConfirmModal,
+} from '../../components';
 import {onMessageShow} from '../../lib/helper';
 import navigation from '../../lib/navigationService';
 import theme from '../../theme';
 import {AppRoute} from '../../navigation/appRoute';
-import {addNoteAction, updateNoteAction} from '../NotesScreen/action';
+import {
+  addNoteAction,
+  updateNoteAction,
+  archiveNoteAction,
+  deleteNoteAction,
+} from '../NotesScreen/action';
 
 const {width} = Dimensions.get('window');
 class AddNoteScreen extends Component {
@@ -29,6 +39,8 @@ class AddNoteScreen extends Component {
     },
     headerTitle: 'Add new note',
     buttonText: 'Save',
+    deleteModal: false,
+    archiveModal: false,
   };
 
   componentDidMount() {
@@ -93,6 +105,18 @@ class AddNoteScreen extends Component {
     }
   }
 
+  onArchiveHandler() {
+    this.setState({archiveModal: false}, () => {
+      this.props.archiveNoteAction({noteId: this.props.route.params.note._id});
+    });
+  }
+
+  onDeleteHandler() {
+    this.setState({deleteModal: false}, () => {
+      this.props.deleteNoteAction({noteId: this.props.route.params.note._id});
+    });
+  }
+
   render() {
     return (
       <View style={styles.mainView}>
@@ -131,12 +155,32 @@ class AddNoteScreen extends Component {
               onPress={() => navigation.navigate(AppRoute.NOTES)}
             />
           </View>
-          <View style={styles.buttonsRow}>
-            <AddNoteButton text="Archive" />
-            <AddNoteButton text="Delete" />
-          </View>
+          {this.state.buttonText !== 'Save' ? (
+            <View style={styles.buttonsRow}>
+              <AddNoteButton
+                text="Archive"
+                onPress={() => this.setState({archiveModal: true})}
+              />
+              <AddNoteButton
+                text="Delete"
+                onPress={() => this.setState({deleteModal: true})}
+              />
+            </View>
+          ) : null}
         </ScrollView>
         <LoadingContainer loading={this.props.loading} />
+        <ConfirmModal
+          visible={this.state.deleteModal}
+          onClose={() => this.setState({deleteModal: false})}
+          message="Are you sure to delete this note?"
+          onYesPress={() => this.onDeleteHandler()}
+        />
+        <ConfirmModal
+          visible={this.state.archiveModal}
+          onClose={() => this.setState({archiveModal: false})}
+          message="Are you sure to archive this note?"
+          onYesPress={() => this.onArchiveHandler()}
+        />
       </View>
     );
   }
@@ -181,6 +225,8 @@ function mapDispatchToProps(dispatch) {
     {
       addNoteAction,
       updateNoteAction,
+      deleteNoteAction,
+      archiveNoteAction,
     },
     dispatch,
   );

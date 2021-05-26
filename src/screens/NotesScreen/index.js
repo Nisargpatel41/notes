@@ -23,7 +23,6 @@ import {
   NoteCard,
 } from '../../components';
 // import {notes} from '../../lib/dummyData';
-import navigation from '../../lib/navigationService';
 import {AppRoute} from '../../navigation/appRoute';
 import {onMessageShow} from '../../lib/helper';
 import theme from '../../theme';
@@ -31,6 +30,8 @@ import {
   getNotesAction,
   callPendingSubmits,
   setPendingDataAction,
+  deleteNoteAction,
+  archiveNoteAction,
 } from './action';
 
 const {height} = Dimensions.get('window');
@@ -40,15 +41,23 @@ const NotesScreen = ({navigation}) => {
 
   const {
     notes,
+    success,
+    error,
     loading,
     pendingAddNotes,
     pendingUpdateNotes,
+    pendingArchiveNotes,
+    pendingDeleteNotes,
     callPendingSubmitsSuccess,
     callPendingSubmitsError,
   } = useSelector(state => ({
     notes: state.notesReducer.notes,
+    success: state.notesReducer.success,
+    error: state.notesReducer.error,
     pendingAddNotes: state.notesReducer.pendingAddNotes,
     pendingUpdateNotes: state.notesReducer.pendingUpdateNotes,
+    pendingArchiveNotes: state.notesReducer.pendingArchiveNotes,
+    pendingDeleteNotes: state.notesReducer.pendingDeleteNotes,
     callPendingSubmitsSuccess: state.notesReducer.callPendingSubmitsSuccess,
     callPendingSubmitsError: state.notesReducer.callPendingSubmitsError,
     loading: state.notesReducer.loading,
@@ -83,7 +92,8 @@ const NotesScreen = ({navigation}) => {
   }, [navigation]);
 
   useEffect(() => {
-    const newarr = notes.sort((a, b) => {
+    const filteredNotes = notes.filter(note => note.isDeleted === false);
+    const newarr = filteredNotes.sort((a, b) => {
       return moment(b.modifiedAt).diff(a.modifiedAt);
     });
     setSortedNotes(newarr);
@@ -92,11 +102,18 @@ const NotesScreen = ({navigation}) => {
   // CALL DATA AND PENDING WHEN CONNECTED
   useEffect(() => {
     if (isConnected) {
-      if (pendingAddNotes.length > 0 || pendingUpdateNotes.length > 0) {
+      if (
+        pendingAddNotes.length > 0 ||
+        pendingUpdateNotes.length > 0 ||
+        pendingArchiveNotes.length > 0 ||
+        pendingDeleteNotes.length > 0
+      ) {
         dispatch(
           callPendingSubmits({
             pendingAddNotes: pendingAddNotes,
             pendingUpdateNotes: pendingUpdateNotes,
+            pendingArchiveNotes: pendingArchiveNotes,
+            pendingDeleteNotes: pendingDeleteNotes,
           }),
         );
       }
@@ -116,6 +133,19 @@ const NotesScreen = ({navigation}) => {
       onMessageShow(callPendingSubmitsError, 'danger');
     }
   }, [callPendingSubmitsError]);
+
+  useEffect(() => {
+    if (success !== '') {
+      onMessageShow(success, 'success');
+      dispatch(getNotesAction());
+    }
+  }, [success]);
+
+  useEffect(() => {
+    if (error !== '') {
+      onMessageShow(error, 'danger');
+    }
+  }, [error]);
 
   handleNotePress = note => {
     navigation.navigate(AppRoute.ADD_NOTE, {note});
@@ -142,13 +172,15 @@ const NotesScreen = ({navigation}) => {
   };
 
   handleArchiveModalYesPress = () => {
-    console.log(archiveNoteId);
+    dispatch(archiveNoteAction({noteId: archiveNoteId}));
     setIsArchiveNoteVisible(false);
+    setDeleteNoteId('');
   };
 
   handleDeleteModalYesPress = () => {
-    console.log(deleteNoteId);
+    dispatch(deleteNoteAction({noteId: deleteNoteId}));
     setIsDeleteNoteVisible(false);
+    setArchiveNoteId('');
   };
 
   return (
