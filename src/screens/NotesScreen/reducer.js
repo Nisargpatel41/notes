@@ -7,10 +7,13 @@ import {
   ADD_NOTE_LOADING,
   ADD_NOTE_SUCCESS,
   ADD_PENDING_NOTE,
+  UPDATE_NOTE_ERROR,
+  UPDATE_NOTE_LOADING,
+  UPDATE_NOTE_SUCCESS,
+  UPDATE_PENDING_NOTE,
   CALL_PENDING_SUBMITS_ERROR,
   CALL_PENDING_SUBMITS_LOADING,
   CALL_PENDING_SUBMITS_SUCCESS,
-  UPDATE_PENDING_NOTE,
   SET_PENDING_DATA,
 } from './types';
 import {arrayIfKeySame} from '../../lib/helper';
@@ -40,7 +43,11 @@ export const notesReducer = createReducer(initialState, {
 
   [GET_NOTES_SUCCESS](state, action) {
     return Object.assign({}, state, {
-      notes: [...state.pendingAddNotes, ...action.payload],
+      notes: [
+        ...state.pendingAddNotes,
+        ...state.pendingUpdateNotes,
+        ...action.payload,
+      ],
       error: '',
       loading: false,
     });
@@ -89,18 +96,40 @@ export const notesReducer = createReducer(initialState, {
     });
   },
 
-  [UPDATE_PENDING_NOTE](state, action) {
-    //   let updatedPending = state.pendingSubmits;
-    //   let payloadKey = Object.keys(action.payload)[0];
-    //   let payloadValue = Object.values(action.payload)[0];
-    //   if (Object.keys(state.pendingSubmits).includes(payloadKey)) {
-    //     updatedPending[payloadKey] = reducerDeleteAtIndex(
-    //       state.pendingSubmits[payloadKey],
-    //       payloadValue,
-    //     );
-    //   }
+  // UPDATE NOTE
+  [UPDATE_NOTE_LOADING](state, action) {
     return Object.assign({}, state, {
-      pendingAddNotes: action.payload,
+      loading: action.payload,
+    });
+  },
+
+  [UPDATE_NOTE_SUCCESS](state, action) {
+    return Object.assign({}, state, {
+      success: action.payload,
+      error: '',
+      loading: false,
+    });
+  },
+
+  [UPDATE_NOTE_ERROR](state, action) {
+    return Object.assign({}, state, {
+      error: action.payload,
+      loading: false,
+      success: '',
+    });
+  },
+
+  //UPDATE PENDING NOTE
+  [UPDATE_PENDING_NOTE](state, action) {
+    let tempArray = state.pendingUpdateNotes;
+    tempArray.push(action.payload);
+
+    let tempNotes = [...state.notes, ...tempArray];
+    let updatedNotes = arrayIfKeySame(tempNotes, note => note._id);
+
+    return Object.assign({}, state, {
+      pendingUpdateNotes: tempArray,
+      notes: updatedNotes,
     });
   },
 

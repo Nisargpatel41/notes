@@ -15,9 +15,9 @@ import HTML from 'react-native-render-html';
 const titleLength = 25;
 const descLength = 100;
 
-const NoteCard = ({note}) => {
+const NoteCard = ({note, onNotePress}) => {
   return (
-    <View style={styles.cardMain}>
+    <TouchableOpacity style={styles.cardMain} onPress={() => onNotePress(note)}>
       <View style={styles.cardHeader}>
         <View style={styles.titleView}>
           <Text style={styles.title}>
@@ -54,7 +54,7 @@ const NoteCard = ({note}) => {
           </View>
         ) : null}
       </ScrollView>
-    </View>
+    </TouchableOpacity>
   );
 };
 

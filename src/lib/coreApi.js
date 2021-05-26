@@ -43,7 +43,7 @@ export default {
       const url = domainUrl + link;
       fetch(url, {
         body: JSON.stringify(data),
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-type': 'application/json',
         },

@@ -41,11 +41,13 @@ const NotesScreen = ({navigation}) => {
     notes,
     loading,
     pendingAddNotes,
+    pendingUpdateNotes,
     callPendingSubmitsSuccess,
     callPendingSubmitsError,
   } = useSelector(state => ({
     notes: state.notesReducer.notes,
     pendingAddNotes: state.notesReducer.pendingAddNotes,
+    pendingUpdateNotes: state.notesReducer.pendingUpdateNotes,
     callPendingSubmitsSuccess: state.notesReducer.callPendingSubmitsSuccess,
     callPendingSubmitsError: state.notesReducer.callPendingSubmitsError,
     loading: state.notesReducer.loading,
@@ -83,10 +85,11 @@ const NotesScreen = ({navigation}) => {
   // CALL DATA AND PENDING WHEN CONNECTED
   useEffect(() => {
     if (isConnected) {
-      if (pendingAddNotes.length > 0) {
+      if (pendingAddNotes.length > 0 || pendingUpdateNotes.length > 0) {
         dispatch(
           callPendingSubmits({
             pendingAddNotes: pendingAddNotes,
+            pendingUpdateNotes: pendingUpdateNotes,
           }),
         );
       }
@@ -101,6 +104,10 @@ const NotesScreen = ({navigation}) => {
     }
   }, [callPendingSubmitsSuccess]);
 
+  handleNotePress = note => {
+    navigation.navigate(AppRoute.ADD_NOTE, {note});
+  };
+
   return (
     <View style={styles.main}>
       <Header title="Nisu's notes" searchEnabled />
@@ -114,7 +121,9 @@ const NotesScreen = ({navigation}) => {
             showsVerticalScrollIndicator={false}
             scrollEnabled={true}
             keyExtractor={item => '_' + item._id}
-            renderItem={({item, index}) => <NoteCard key={index} note={item} />}
+            renderItem={({item, index}) => (
+              <NoteCard key={index} note={item} onNotePress={handleNotePress} />
+            )}
             numColumns={1}
           />
         ) : (

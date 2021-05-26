@@ -11,3 +11,9 @@ export const addNoteApi = data => {
   let result = coreApi.POST(url, data);
   return result;
 };
+
+export const updateNoteApi = data => {
+  let url = '/updateNote';
+  let result = coreApi.PUT(url, data);
+  return result;
+};

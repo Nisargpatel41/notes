@@ -18,7 +18,7 @@ import {onMessageShow} from '../../lib/helper';
 import navigation from '../../lib/navigationService';
 import theme from '../../theme';
 import {AppRoute} from '../../navigation/appRoute';
-import {addNoteAction} from '../NotesScreen/action';
+import {addNoteAction, updateNoteAction} from '../NotesScreen/action';
 
 const {width} = Dimensions.get('window');
 class AddNoteScreen extends Component {
@@ -27,7 +27,26 @@ class AddNoteScreen extends Component {
       title: '',
       content: '',
     },
+    headerTitle: 'Add new note',
+    buttonText: 'Save',
   };
+
+  componentDidMount() {
+    const {route} = this.props;
+
+    if (route.params) {
+      const {note} = route.params;
+      let data = {
+        title: note.title,
+        content: note.content ? note.content : '',
+      };
+      this.setState({
+        data: data,
+        headerTitle: 'Edit note',
+        buttonText: 'Update',
+      });
+    }
+  }
 
   componentDidUpdate(prevProps) {
     const {success, error} = this.props;
@@ -36,9 +55,7 @@ class AddNoteScreen extends Component {
       if (success !== '') {
         onMessageShow(success, 'success');
       }
-      setTimeout(() => {
-        navigation.navigate(AppRoute.NOTES);
-      }, 500);
+      navigation.navigate(AppRoute.NOTES);
     }
 
     if (prevProps.error !== error) {
@@ -57,16 +74,29 @@ class AddNoteScreen extends Component {
       onMessageShow('Please enter title', 'danger');
     } else {
       let data = {...this.state.data};
-      data['createdAt'] = moment().toISOString();
       data['modifiedAt'] = moment().toISOString();
-      this.props.addNoteAction(data);
+      data['isDeleted'] = false;
+
+      if (this.state.buttonText === 'Save') {
+        data['createdAt'] = moment().toISOString();
+        this.props.addNoteAction(data);
+      } else {
+        const {notes, route} = this.props;
+        let tempNotes = notes;
+        const updatedRecordIndex = tempNotes.findIndex(
+          note => note._id === route.params.note._id,
+        );
+        data['noteId'] = route.params.note._id;
+        tempNotes.splice(updatedRecordIndex, 1);
+        this.props.updateNoteAction(data);
+      }
     }
   }
 
   render() {
     return (
       <View style={styles.mainView}>
-        <Header title="Add new note" />
+        <Header title={this.state.headerTitle} />
         <ScrollView style={styles.contentView}>
           <View style={styles.titleView}>
             <TextInput
@@ -74,7 +104,7 @@ class AddNoteScreen extends Component {
               placeholder="title"
               placeholderTextColor={theme.colors.GREY2}
               onChangeText={text => this.onChangeHandler('title', text)}
-              value={this.state.title}
+              value={this.state.data.title}
             />
           </View>
           <View style={styles.editorView}>
@@ -88,13 +118,14 @@ class AddNoteScreen extends Component {
               placeholder="note"
               editorStyle={{placeholderColor: theme.colors.GREY2}}
               ref={r => (this.richText = r)}
-              // initialContentHTML={
-              //   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text"
-              // }
+              initialContentHTML={this.state.data.content}
             />
           </View>
           <View style={styles.buttonsRow}>
-            <AddNoteButton text="Save" onPress={() => this.onSaveHandler()} />
+            <AddNoteButton
+              text={this.state.buttonText}
+              onPress={() => this.onSaveHandler()}
+            />
             <AddNoteButton
               text="Cancel"
               onPress={() => navigation.navigate(AppRoute.NOTES)}
@@ -149,6 +180,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(
     {
       addNoteAction,
+      updateNoteAction,
     },
     dispatch,
   );
@@ -159,6 +191,7 @@ const mapStateToProps = state => {
     loading: state.notesReducer.loading,
     error: state.notesReducer.error,
     success: state.notesReducer.success,
+    notes: state.notesReducer.notes,
   };
 };
 
