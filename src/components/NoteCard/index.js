@@ -15,7 +15,7 @@ import HTML from 'react-native-render-html';
 const titleLength = 25;
 const descLength = 100;
 
-const NoteCard = ({note, onNotePress}) => {
+const NoteCard = ({note, onNotePress, onArchivePress, onDeletePress}) => {
   return (
     <TouchableOpacity style={styles.cardMain} onPress={() => onNotePress(note)}>
       <View style={styles.cardHeader}>
@@ -27,10 +27,12 @@ const NoteCard = ({note, onNotePress}) => {
           </Text>
         </View>
         <View style={styles.iconsView}>
-          <TouchableOpacity style={{marginRight: 10}}>
+          <TouchableOpacity
+            style={{marginRight: 10}}
+            onPress={() => onArchivePress(note?._id)}>
             <Icon name="archive" />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => onDeletePress(note?._id)}>
             <Icon name="delete" />
           </TouchableOpacity>
         </View>

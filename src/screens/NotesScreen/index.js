@@ -9,6 +9,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import NetInfo from '@react-native-community/netinfo';
@@ -53,12 +54,18 @@ const NotesScreen = ({navigation}) => {
     loading: state.notesReducer.loading,
   }));
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isDeleteNoteVisible, setIsDeleteNoteVisible] = useState(false);
+  const [isArchiveNoteVisible, setIsArchiveNoteVisible] = useState(false);
   const [sortedNotes, setSortedNotes] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
 
+  const [archiveNoteId, setArchiveNoteId] = useState('');
+  const [deleteNoteId, setDeleteNoteId] = useState('');
+
   useEffect(() => {
-    SplashScreen.hide();
+    setTimeout(() => {
+      SplashScreen.hide();
+    }, 500);
   }, []);
 
   useEffect(() => {
@@ -104,16 +111,50 @@ const NotesScreen = ({navigation}) => {
     }
   }, [callPendingSubmitsSuccess]);
 
+  useEffect(() => {
+    if (callPendingSubmitsError !== '') {
+      onMessageShow(callPendingSubmitsError, 'danger');
+    }
+  }, [callPendingSubmitsError]);
+
   handleNotePress = note => {
     navigation.navigate(AppRoute.ADD_NOTE, {note});
+  };
+
+  handleArchivePress = id => {
+    setArchiveNoteId(id);
+    setIsArchiveNoteVisible(true);
+  };
+
+  handleDeletePress = id => {
+    setDeleteNoteId(id);
+    setIsDeleteNoteVisible(true);
+  };
+
+  handleDeleteModalClose = value => {
+    setDeleteNoteId('');
+    setIsDeleteNoteVisible(value);
+  };
+
+  handleArchiveModalClose = value => {
+    setArchiveNoteId('');
+    setIsArchiveNoteVisible(value);
+  };
+
+  handleArchiveModalYesPress = () => {
+    console.log(archiveNoteId);
+    setIsArchiveNoteVisible(false);
+  };
+
+  handleDeleteModalYesPress = () => {
+    console.log(deleteNoteId);
+    setIsDeleteNoteVisible(false);
   };
 
   return (
     <View style={styles.main}>
       <Header title="Nisu's notes" searchEnabled />
       <View style={styles.contentView}>
-        {/* <Button title="test" onPress={() => setIsVisible(true)} /> */}
-
         {sortedNotes.length > 0 ? (
           <FlatList
             data={sortedNotes}
@@ -122,7 +163,13 @@ const NotesScreen = ({navigation}) => {
             scrollEnabled={true}
             keyExtractor={item => '_' + item._id}
             renderItem={({item, index}) => (
-              <NoteCard key={index} note={item} onNotePress={handleNotePress} />
+              <NoteCard
+                key={index}
+                note={item}
+                onNotePress={handleNotePress}
+                onArchivePress={handleArchivePress}
+                onDeletePress={handleDeletePress}
+              />
             )}
             numColumns={1}
           />
@@ -143,7 +190,18 @@ const NotesScreen = ({navigation}) => {
         <Icon name="add" color={theme.colors.WHITE} />
       </TouchableOpacity>
       <LoadingContainer loading={loading} />
-      {/* <ConfirmModal visible={isVisible} onClose={setIsVisible} /> */}
+      <ConfirmModal
+        visible={isDeleteNoteVisible}
+        onClose={handleDeleteModalClose}
+        message="Are you sure to delete this note?"
+        onYesPress={handleDeleteModalYesPress}
+      />
+      <ConfirmModal
+        visible={isArchiveNoteVisible}
+        onClose={handleArchiveModalClose}
+        message="Are you sure to archive this note?"
+        onYesPress={handleArchiveModalYesPress}
+      />
     </View>
   );
 };
