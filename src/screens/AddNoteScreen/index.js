@@ -132,17 +132,17 @@ class AddNoteScreen extends Component {
             />
           </View>
           <View style={styles.editorView}>
-            <RichToolbar
-              getEditor={() => this.richText}
-              selectedIconTint={theme.colors.PRIMARY_BLUE}
-              style={styles.toolbar}
-            />
             <RichEditor
               onChange={text => this.onChangeHandler('content', text)}
               placeholder="note"
               editorStyle={{placeholderColor: theme.colors.GREY2}}
               ref={r => (this.richText = r)}
               initialContentHTML={this.state.data.content}
+            />
+            <RichToolbar
+              getEditor={() => this.richText}
+              selectedIconTint={theme.colors.PRIMARY_BLUE}
+              style={styles.toolbar}
             />
           </View>
           <View style={styles.buttonsRow}>
@@ -210,8 +210,8 @@ const styles = StyleSheet.create({
   },
   toolbar: {
     backgroundColor: theme.colors.WHITE,
-    borderBottomColor: theme.colors.GREY4,
-    borderBottomWidth: 1,
+    borderTopColor: theme.colors.GREY4,
+    // borderTopWidth: 1,
   },
   buttonsRow: {
     width: width - 20,

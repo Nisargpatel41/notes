@@ -14,13 +14,21 @@ import HTML from 'react-native-render-html';
 
 const titleLength = 25;
 const descLength = 100;
+const mongoIdRegex = new RegExp('^[0-9a-fA-F]{24}$');
 
 const NoteCard = ({note, onNotePress, onArchivePress, onDeletePress}) => {
   return (
     <TouchableOpacity style={styles.cardMain} onPress={() => onNotePress(note)}>
       <View style={styles.cardHeader}>
         <View style={styles.titleView}>
-          <Text style={styles.title}>
+          {!mongoIdRegex.test(note?._id) ? (
+            <Icon name="unsynced" color="red" />
+          ) : null}
+          <Text
+            style={[
+              styles.title,
+              {marginLeft: mongoIdRegex.test(note?._id) ? 0 : 5},
+            ]}>
             {note?.title.length > titleLength
               ? truncate(note?.title, titleLength)
               : note?.title}
@@ -78,8 +86,10 @@ const styles = StyleSheet.create({
   },
   titleView: {
     flex: 4,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     paddingHorizontal: 5,
+    flexDirection: 'row',
   },
   title: {
     fontSize: theme.fontSize.MEDIUM,

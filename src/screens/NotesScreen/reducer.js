@@ -129,14 +129,25 @@ export const notesReducer = createReducer(initialState, {
 
   //UPDATE PENDING NOTE
   [UPDATE_PENDING_NOTE](state, action) {
+    let mongoIdRegex = new RegExp('^[0-9a-fA-F]{24}$');
     let tempArray = state.pendingUpdateNotes;
-    tempArray.push(action.payload);
+    let tempPendingNotes = [...state.pendingAddNotes];
 
-    let tempNotes = [...state.notes, ...tempArray];
+    if (mongoIdRegex.test(action.payload.noteId)) {
+      tempArray.push(action.payload);
+    } else {
+      let thisNoteIndex = tempPendingNotes.findIndex(
+        note => note._id === action.payload.noteId,
+      );
+      tempPendingNotes[thisNoteIndex] = action.payload;
+    }
+
+    let tempNotes = [...state.notes, ...tempArray, ...tempPendingNotes];
     let updatedNotes = arrayIfKeySame(tempNotes, note => note._id);
 
     return Object.assign({}, state, {
       pendingUpdateNotes: tempArray,
+      pendingAddNotes: tempPendingNotes,
       notes: updatedNotes,
     });
   },
@@ -166,8 +177,18 @@ export const notesReducer = createReducer(initialState, {
 
   //ARCHIVE PENDING NOTE
   [ARCHIVE_PENDING_NOTE](state, action) {
+    let mongoIdRegex = new RegExp('^[0-9a-fA-F]{24}$');
     let tempArray = state.pendingArchiveNotes;
-    tempArray.push(action.payload);
+    let tempPendingNotes = [...state.pendingAddNotes];
+
+    if (mongoIdRegex.test(action.payload.noteId)) {
+      tempArray.push(action.payload);
+    } else {
+      let thisNoteIndex = tempPendingNotes.findIndex(
+        note => note._id === action.payload.noteId,
+      );
+      tempPendingNotes.splice(thisNoteIndex, 1);
+    }
 
     let tempNotes = [...state.notes];
     let thisNoteIndex = tempNotes.findIndex(
@@ -177,6 +198,7 @@ export const notesReducer = createReducer(initialState, {
     return Object.assign({}, state, {
       pendingArchiveNotes: tempArray,
       notes: tempNotes,
+      pendingAddNotes: tempPendingNotes,
     });
   },
 
@@ -205,8 +227,19 @@ export const notesReducer = createReducer(initialState, {
 
   //DELETE PENDING NOTE
   [DELETE_PENDING_NOTE](state, action) {
+    let mongoIdRegex = new RegExp('^[0-9a-fA-F]{24}$');
+
     let tempArray = state.pendingDeleteNotes;
-    tempArray.push(action.payload);
+    let tempPendingNotes = [...state.pendingAddNotes];
+
+    if (mongoIdRegex.test(action.payload.noteId)) {
+      tempArray.push(action.payload);
+    } else {
+      let thisNoteIndex = tempPendingNotes.findIndex(
+        note => note._id === action.payload.noteId,
+      );
+      tempPendingNotes.splice(thisNoteIndex, 1);
+    }
 
     let tempNotes = [...state.notes];
     let thisNoteIndex = tempNotes.findIndex(
@@ -217,6 +250,7 @@ export const notesReducer = createReducer(initialState, {
     return Object.assign({}, state, {
       pendingDeleteNotes: tempArray,
       notes: tempNotes,
+      pendingAddNotes: tempPendingNotes,
     });
   },
 
