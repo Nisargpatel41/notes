@@ -67,6 +67,7 @@ const NotesScreen = ({navigation}) => {
   const [isArchiveNoteVisible, setIsArchiveNoteVisible] = useState(false);
   const [sortedNotes, setSortedNotes] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   const [archiveNoteId, setArchiveNoteId] = useState('');
   const [deleteNoteId, setDeleteNoteId] = useState('');
@@ -92,12 +93,24 @@ const NotesScreen = ({navigation}) => {
   }, [navigation]);
 
   useEffect(() => {
-    const filteredNotes = notes.filter(note => note.isDeleted === false);
-    const newarr = filteredNotes.sort((a, b) => {
+    refillData();
+  }, [notes]);
+
+  useEffect(() => {
+    let tempNotes = [...notes];
+    if (searchText !== '') {
+      tempNotes = tempNotes.filter(
+        note =>
+          note.title.toLowerCase().includes(searchText.toLowerCase()) ||
+          note.content.toLowerCase().includes(searchText.toLowerCase()),
+      );
+    }
+
+    const newarr = tempNotes.sort((a, b) => {
       return moment(b.modifiedAt).diff(a.modifiedAt);
     });
     setSortedNotes(newarr);
-  }, [notes]);
+  }, [searchText]);
 
   // CALL DATA AND PENDING WHEN CONNECTED
   useEffect(() => {
@@ -147,37 +160,45 @@ const NotesScreen = ({navigation}) => {
     }
   }, [error]);
 
-  handleNotePress = note => {
+  const refillData = () => {
+    const filteredNotes = notes.filter(note => note.isDeleted === false);
+    const newarr = filteredNotes.sort((a, b) => {
+      return moment(b.modifiedAt).diff(a.modifiedAt);
+    });
+    setSortedNotes(newarr);
+  };
+
+  const handleNotePress = note => {
     navigation.navigate(AppRoute.ADD_NOTE, {note});
   };
 
-  handleArchivePress = id => {
+  const handleArchivePress = id => {
     setArchiveNoteId(id);
     setIsArchiveNoteVisible(true);
   };
 
-  handleDeletePress = id => {
+  const handleDeletePress = id => {
     setDeleteNoteId(id);
     setIsDeleteNoteVisible(true);
   };
 
-  handleDeleteModalClose = value => {
+  const handleDeleteModalClose = value => {
     setDeleteNoteId('');
     setIsDeleteNoteVisible(value);
   };
 
-  handleArchiveModalClose = value => {
+  const handleArchiveModalClose = value => {
     setArchiveNoteId('');
     setIsArchiveNoteVisible(value);
   };
 
-  handleArchiveModalYesPress = () => {
+  const handleArchiveModalYesPress = () => {
     dispatch(archiveNoteAction({noteId: archiveNoteId}));
     setIsArchiveNoteVisible(false);
     setDeleteNoteId('');
   };
 
-  handleDeleteModalYesPress = () => {
+  const handleDeleteModalYesPress = () => {
     dispatch(deleteNoteAction({noteId: deleteNoteId}));
     setIsDeleteNoteVisible(false);
     setArchiveNoteId('');
@@ -185,7 +206,15 @@ const NotesScreen = ({navigation}) => {
 
   return (
     <View style={styles.main}>
-      <Header title="Nisu's notes" searchEnabled />
+      <Header
+        title="Nisu's notes"
+        searchEnabled
+        onChangeText={text => setSearchText(text)}
+        onSearchClose={() => {
+          setSearchText('');
+          refillData();
+        }}
+      />
       <View style={styles.contentView}>
         {sortedNotes.length > 0 ? (
           <FlatList

@@ -9,8 +9,13 @@ import {
 import {Icon} from '..';
 import theme from '../../theme';
 
-const Header = ({title, searchEnabled, onChangeText}) => {
+const Header = ({title, searchEnabled, onChangeText, onSearchClose}) => {
   const [searchOpen, setSearchOpen] = useState(false);
+
+  const onClosePress = () => {
+    setSearchOpen(false);
+    onSearchClose();
+  };
 
   return (
     <View style={styles.main}>
@@ -32,9 +37,10 @@ const Header = ({title, searchEnabled, onChangeText}) => {
             placeholderTextColor={theme.colors.PLACE_HOLDER_TEXT_COLOR}
             style={styles.searchInput}
             onChangeText={onChangeText}
+            autoFocus
           />
           <TouchableOpacity
-            onPress={() => setSearchOpen(false)}
+            onPress={() => onClosePress()}
             style={styles.closeButton}>
             <Icon
               name="close"
